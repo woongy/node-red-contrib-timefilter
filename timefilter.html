@@ -1,0 +1,245 @@
+<script type="text/javascript">
+  RED.nodes.registerType("timefilter", {
+    category: "advanced-function",
+    color: "#eeeeee",
+    defaults: {
+      name: { value: "" },
+      starttime: { value: "", required: true },
+      endtime: { value: "", required: true },
+      sun: { value: true },
+      mon: { value: true },
+      tue: { value: true },
+      wed: { value: true },
+      thu: { value: true },
+      fri: { value: true },
+      sat: { value: true },
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "timer.png",
+    label: function() {
+      return this.name || "timefilter";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-help-name="timefilter">
+  <p>A timefilter node.</p>
+</script>
+
+<script type="text/x-red" data-template-name="timefilter">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-starttime"><i class="fa fa-clock-o"></i> Time&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;From</label>
+    <select id="node-input-starttime" style="width:24% !important">
+      <option value=  "0">00:00</option>
+      <option value= "15">00:15</option>
+      <option value= "30">00:30</option>
+      <option value= "45">00:45</option>
+      <option value= "60">01:00</option>
+      <option value= "75">01:15</option>
+      <option value= "90">01:30</option>
+      <option value="105">01:45</option>
+      <option value="120">02:00</option>
+      <option value="135">02:15</option>
+      <option value="150">02:30</option>
+      <option value="165">02:45</option>
+      <option value="180">03:00</option>
+      <option value="195">03:15</option>
+      <option value="210">03:30</option>
+      <option value="225">03:45</option>
+      <option value="240">04:00</option>
+      <option value="255">04:15</option>
+      <option value="270">04:30</option>
+      <option value="285">04:45</option>
+      <option value="300">05:00</option>
+      <option value="315">05:15</option>
+      <option value="330">05:30</option>
+      <option value="345">05:45</option>
+      <option value="360">06:00</option>
+      <option value="375">06:15</option>
+      <option value="390">06:30</option>
+      <option value="405">06:45</option>
+      <option value="420">07:00</option>
+      <option value="435">07:15</option>
+      <option value="450">07:30</option>
+      <option value="465">07:45</option>
+      <option value="480">08:00</option>
+      <option value="495">08:15</option>
+      <option value="510">08:30</option>
+      <option value="525">08:45</option>
+      <option value="540">09:00</option>
+      <option value="555">09:15</option>
+      <option value="570">09:30</option>
+      <option value="585">09:45</option>
+      <option value="600">10:00</option>
+      <option value="615">10:15</option>
+      <option value="630">10:30</option>
+      <option value="645">10:45</option>
+      <option value="660">11:00</option>
+      <option value="675">11:15</option>
+      <option value="690">11:30</option>
+      <option value="705">11:45</option>
+      <option value="720">12:00</option>
+      <option value="735">12:15</option>
+      <option value="750">12:30</option>
+      <option value="765">12:45</option>
+      <option value="780">13:00</option>
+      <option value="795">13:15</option>
+      <option value="810">13:30</option>
+      <option value="825">13:45</option>
+      <option value="840">14:00</option>
+      <option value="855">14:15</option>
+      <option value="870">14:30</option>
+      <option value="885">14:45</option>
+      <option value="900">15:00</option>
+      <option value="915">15:15</option>
+      <option value="930">15:30</option>
+      <option value="945">15:45</option>
+      <option value="960">16:00</option>
+      <option value="975">16:15</option>
+      <option value="990">16:30</option>
+      <option value="1005">16:45</option>
+      <option value="1020">17:00</option>
+      <option value="1035">17:15</option>
+      <option value="1050">17:30</option>
+      <option value="1065">17:45</option>
+      <option value="1080">18:00</option>
+      <option value="1095">18:15</option>
+      <option value="1110">18:30</option>
+      <option value="1125">18:45</option>
+      <option value="1140">19:00</option>
+      <option value="1155">19:15</option>
+      <option value="1170">19:30</option>
+      <option value="1185">19:45</option>
+      <option value="1200">20:00</option>
+      <option value="1215">20:15</option>
+      <option value="1230">20:30</option>
+      <option value="1245">20:45</option>
+      <option value="1260">21:00</option>
+      <option value="1275">21:15</option>
+      <option value="1290">21:30</option>
+      <option value="1305">21:45</option>
+      <option value="1320">22:00</option>
+      <option value="1335">22:15</option>
+      <option value="1350">22:30</option>
+      <option value="1365">22:45</option>
+      <option value="1380">23:00</option>
+      <option value="1395">23:15</option>
+      <option value="1410">23:30</option>
+      <option value="1425">23:45</option>
+    </select>
+    <div style="display:inline-block; width:12%; text-align:right;">To</div>
+    <select id="node-input-endtime" style="width:24% !important">
+      <option value=  "0">00:00</option>
+      <option value= "15">00:15</option>
+      <option value= "30">00:30</option>
+      <option value= "45">00:45</option>
+      <option value= "60">01:00</option>
+      <option value= "75">01:15</option>
+      <option value= "90">01:30</option>
+      <option value="105">01:45</option>
+      <option value="120">02:00</option>
+      <option value="135">02:15</option>
+      <option value="150">02:30</option>
+      <option value="165">02:45</option>
+      <option value="180">03:00</option>
+      <option value="195">03:15</option>
+      <option value="210">03:30</option>
+      <option value="225">03:45</option>
+      <option value="240">04:00</option>
+      <option value="255">04:15</option>
+      <option value="270">04:30</option>
+      <option value="285">04:45</option>
+      <option value="300">05:00</option>
+      <option value="315">05:15</option>
+      <option value="330">05:30</option>
+      <option value="345">05:45</option>
+      <option value="360">06:00</option>
+      <option value="375">06:15</option>
+      <option value="390">06:30</option>
+      <option value="405">06:45</option>
+      <option value="420">07:00</option>
+      <option value="435">07:15</option>
+      <option value="450">07:30</option>
+      <option value="465">07:45</option>
+      <option value="480">08:00</option>
+      <option value="495">08:15</option>
+      <option value="510">08:30</option>
+      <option value="525">08:45</option>
+      <option value="540">09:00</option>
+      <option value="555">09:15</option>
+      <option value="570">09:30</option>
+      <option value="585">09:45</option>
+      <option value="600">10:00</option>
+      <option value="615">10:15</option>
+      <option value="630">10:30</option>
+      <option value="645">10:45</option>
+      <option value="660">11:00</option>
+      <option value="675">11:15</option>
+      <option value="690">11:30</option>
+      <option value="705">11:45</option>
+      <option value="720">12:00</option>
+      <option value="735">12:15</option>
+      <option value="750">12:30</option>
+      <option value="765">12:45</option>
+      <option value="780">13:00</option>
+      <option value="795">13:15</option>
+      <option value="810">13:30</option>
+      <option value="825">13:45</option>
+      <option value="840">14:00</option>
+      <option value="855">14:15</option>
+      <option value="870">14:30</option>
+      <option value="885">14:45</option>
+      <option value="900">15:00</option>
+      <option value="915">15:15</option>
+      <option value="930">15:30</option>
+      <option value="945">15:45</option>
+      <option value="960">16:00</option>
+      <option value="975">16:15</option>
+      <option value="990">16:30</option>
+      <option value="1005">16:45</option>
+      <option value="1020">17:00</option>
+      <option value="1035">17:15</option>
+      <option value="1050">17:30</option>
+      <option value="1065">17:45</option>
+      <option value="1080">18:00</option>
+      <option value="1095">18:15</option>
+      <option value="1110">18:30</option>
+      <option value="1125">18:45</option>
+      <option value="1140">19:00</option>
+      <option value="1155">19:15</option>
+      <option value="1170">19:30</option>
+      <option value="1185">19:45</option>
+      <option value="1200">20:00</option>
+      <option value="1215">20:15</option>
+      <option value="1230">20:30</option>
+      <option value="1245">20:45</option>
+      <option value="1260">21:00</option>
+      <option value="1275">21:15</option>
+      <option value="1290">21:30</option>
+      <option value="1305">21:45</option>
+      <option value="1320">22:00</option>
+      <option value="1335">22:15</option>
+      <option value="1350">22:30</option>
+      <option value="1365">22:45</option>
+      <option value="1380">23:00</option>
+      <option value="1395">23:15</option>
+      <option value="1410">23:30</option>
+      <option value="1425">23:45</option>
+    </select>
+  </div>
+  <style>input[type=checkbox] { vertical-align:top; position:relative; bottom:1px; }</style>
+  <div>
+    <span style="width: 55px; float: left; margin-left: 5px;"><input type="checkbox" id="node-input-sun" placeholder="sun" > Sun </span>
+    <span style="width: 55px; float: left; margin-left: 5px;"><input type="checkbox" id="node-input-mon" placeholder="mon" > Mon </span>
+    <span style="width: 55px; float: left; margin-left: 5px;"><input type="checkbox" id="node-input-tue" placeholder="tue" > Tue </span>
+    <span style="width: 55px; float: left; margin-left: 5px;"><input type="checkbox" id="node-input-wed" placeholder="wed" > Wed </span>
+    <span style="width: 55px; float: left; margin-left: 5px;"><input type="checkbox" id="node-input-thu" placeholder="thu" > Thu </span>
+    <span style="width: 55px; float: left; margin-left: 5px;"><input type="checkbox" id="node-input-fri" placeholder="fri" > Fri </span>
+    <span style="width: 55px; float: left; margin-left: 5px;"><input type="checkbox" id="node-input-sat" placeholder="sat" > Sat </span>
+  </div>
+</script>
