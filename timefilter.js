@@ -4,8 +4,10 @@ module.exports = function(RED) {
 
   function TimefilterNode(config) {
     RED.nodes.createNode(this, config);
-    this.starttime = Number(config.starttime);
-    this.endtime = Number(config.endtime);
+    this.starthour = Number(config.starthour);
+    this.startmin = Number(config.startmin);
+    this.endhour = Number(config.endhour);
+    this.endmin = Number(config.endmin);
     this.sun = config.sun;
     this.mon = config.mon;
     this.tue = config.tue;
@@ -13,16 +15,13 @@ module.exports = function(RED) {
     this.thu = config.thu;
     this.fri = config.fri;
     this.sat = config.sat;
+    this.pass = false;
     this.cronOnStart = null;
     this.cronOnEnd = null;
     this.called = 0;
 
     var node = this;
 
-    var starthour = Math.floor(node.starttime / 60);
-    var startmin = node.starttime % 60;
-    var endhour = Math.floor(node.endtime / 60);
-    var endmin = node.endtime % 60;
     var days = [];
     if (node.sun) { days.push(0); }
     if (node.mon) { days.push(1); }
@@ -34,14 +33,14 @@ module.exports = function(RED) {
     days = days.join();
 
     node.cronOnStart = new CronJob({
-      cronTime: startmin + " " + starthour + " * * " + days,
+      cronTime: node.startmin + " " + node.starthour + " * * " + days,
       onTick: function() {
         node.pass = true;
         node.send([null, {
           topic: "start",
           payload: {
-            starttime: starthour + ":" + startmin,
-            endtime: endhour + ":" + endmin
+            starttime: node.starthour + ":" + node.startmin,
+            endtime: node.endhour + ":" + node.endmin
           }
         }]);
         node.status({ fill: "green", shape: "dot", text: "on" });
@@ -50,7 +49,7 @@ module.exports = function(RED) {
     });
 
     node.cronOnEnd = new CronJob({
-      cronTime: endmin + " " + endhour + " * * " + days,
+      cronTime: node.endmin + " " + node.endhour + " * * " + days,
       onTick: function() {
         node.pass = false;
         node.send([null, {
@@ -78,6 +77,8 @@ module.exports = function(RED) {
       node.cronOnEnd.stop();
       delete node.cronOnEnd;
     });
+
+    node.status({ fill: "grey", shape: "dot", text: "off" });
   }
 
   RED.nodes.registerType("timefilter", TimefilterNode);
