@@ -13,11 +13,14 @@ module.exports = function(RED) {
     this.thu = config.thu;
     this.fri = config.fri;
     this.sat = config.sat;
-    this.cronjob = null;
+    this.cronOnStart = null;
+    this.cronOnEnd = null;
     this.called = 0;
 
     var node = this;
 
+    var starthour = Math.floor(node.starttime / 60);
+    var startmin = node.starttime % 60;
     var endhour = Math.floor(node.endtime / 60);
     var endmin = node.endtime % 60;
     var days = [];
@@ -30,54 +33,50 @@ module.exports = function(RED) {
     if (node.sat) { days.push(6); }
     days = days.join();
 
-    node.cronjob = new CronJob({
+    node.cronOnStart = new CronJob({
+      cronTime: startmin + " " + starthour + " * * " + days,
+      onTick: function() {
+        node.pass = true;
+        node.send([null, {
+          topic: "start",
+          payload: {
+            starttime: starthour + ":" + startmin,
+            endtime: endhour + ":" + endmin
+          }
+        }]);
+        node.status({ fill: "green", shape: "dot", text: "on" });
+      },
+      start: true
+    });
+
+    node.cronOnEnd = new CronJob({
       cronTime: endmin + " " + endhour + " * * " + days,
       onTick: function() {
-        if (node.called == 0) {
-          node.send([null, {}]);
-        }
+        node.pass = false;
+        node.send([null, {
+          topic: "end",
+          payload: {
+            called: node.called
+          }
+        }]);
         node.called = 0;
+        node.status({ fill: "grey", shape: "dot", text: "off" });
       },
       start: true
     });
 
     node.on("input", function(msg) {
-      var now = new Date();
-
-      var nowoff = -now.getTimezoneOffset() * 60000;
-      var nowMillis = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), 0);
-      nowMillis += nowoff;
-      var midnightMillis = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0);
-      var today = Math.round((nowMillis - midnightMillis) / 60000) % 1440;
-
-      if ((node.starttime <= today) && (today <= node.endtime)) {
-        switch (now.getDay()) {
-          case 0:
-            if (node.sun) { onCall(msg); } break;
-          case 1:
-            if (node.mon) { onCall(msg); } break;
-          case 2:
-            if (node.tue) { onCall(msg); } break;
-          case 3:
-            if (node.wed) { onCall(msg); } break;
-          case 4:
-            if (node.thu) { onCall(msg); } break;
-          case 5:
-            if (node.fri) { onCall(msg); } break;
-          case 6:
-            if (node.sat) { onCall(msg); } break;
-        }
-      }
-
-      function onCall(msg) {
+      if (node.pass) {
         node.called += 1;
         node.send([msg, null]);
       }
     });
 
     node.on("close", function() {
-      node.cronjob.stop();
-      delete node.cronjob;
+      node.cronOnStart.stop();
+      delete node.cronOnStart;
+      node.cronOnEnd.stop();
+      delete node.cronOnEnd;
     });
   }
 
