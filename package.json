@@ -2,7 +2,8 @@
   "name": "node-red-contrib-timefilter",
   "version": "0.0.1",
   "dependencies": {
-    "cron": "1.1.0"
+    "cron": "1.1.0",
+    "left-pad": "1.1.0"
   },
   "node-red": {
     "nodes": {

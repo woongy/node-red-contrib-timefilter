@@ -1,6 +1,7 @@
 module.exports = function(RED) {
   "use strict";
   var CronJob = require("cron").CronJob;
+  var leftPad = require("left-pad");
 
   function TimefilterNode(config) {
     RED.nodes.createNode(this, config);
@@ -39,8 +40,8 @@ module.exports = function(RED) {
         node.send([null, {
           topic: "start",
           payload: {
-            starttime: node.starthour + ":" + node.startmin,
-            endtime: node.endhour + ":" + node.endmin
+            starttime: node.starthour + ":" + leftPad(node.startmin, 2, 0),
+            endtime: node.endhour + ":" + leftPad(node.endmin, 2, 0)
           }
         }]);
         node.status({ fill: "green", shape: "dot", text: "on" });
