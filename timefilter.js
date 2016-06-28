@@ -16,7 +16,6 @@ module.exports = function(RED) {
     this.thu = config.thu;
     this.fri = config.fri;
     this.sat = config.sat;
-    this.pass = false;
     this.cronOnStart = null;
     this.cronOnEnd = null;
     this.called = 0;
@@ -36,7 +35,6 @@ module.exports = function(RED) {
     node.cronOnStart = new CronJob({
       cronTime: node.startmin + " " + node.starthour + " * * " + days,
       onTick: function() {
-        node.pass = true;
         node.send([null, {
           topic: "start",
           payload: {
@@ -52,7 +50,6 @@ module.exports = function(RED) {
     node.cronOnEnd = new CronJob({
       cronTime: node.endmin + " " + node.endhour + " * * " + days,
       onTick: function() {
-        node.pass = false;
         node.send([null, {
           topic: "end",
           payload: {
@@ -66,11 +63,45 @@ module.exports = function(RED) {
     });
 
     node.on("input", function(msg) {
-      if (node.pass) {
-        node.called += 1;
-        node.send([msg, null]);
-      }
+      if (shouldCall()) { onCall(msg); }
     });
+
+    function shouldCall() {
+      var now = new Date();
+
+      var nowoff = -now.getTimezoneOffset() * 60000;
+      var nowMillis = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), 0);
+      nowMillis += nowoff;
+      var midnightMillis = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0);
+      var nowtime = Math.round((nowMillis - midnightMillis) / 60000) % 1440;
+
+      var starttime = node.starthour * 60 + node.startmin
+      var endtime = node.endhour * 60 + node.endmin
+
+      if ((starttime <= nowtime) && (nowtime <= endtime)) {
+        switch (now.getDay()) {
+          case 0:
+            return node.sun;
+          case 1:
+            return node.mon;
+          case 2:
+            return node.tue;
+          case 3:
+            return node.wed;
+          case 4:
+            return node.thu;
+          case 5:
+            return node.fri;
+          case 6:
+            return node.sat;
+        }
+      }
+    }
+
+    function onCall(msg) {
+      node.called += 1;
+      node.send([msg, null]);
+    }
 
     node.on("close", function() {
       node.cronOnStart.stop();
@@ -79,7 +110,11 @@ module.exports = function(RED) {
       delete node.cronOnEnd;
     });
 
-    node.status({ fill: "grey", shape: "dot", text: "off" });
+    if (shouldCall()) {
+      node.status({ fill: "green", shape: "dot", text: "on" });
+    } else {
+      node.status({ fill: "grey", shape: "dot", text: "off" });
+    }
   }
 
   RED.nodes.registerType("timefilter", TimefilterNode);
