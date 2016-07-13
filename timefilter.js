@@ -35,13 +35,17 @@ module.exports = function(RED) {
     node.cronOnStart = new CronJob({
       cronTime: node.startmin + " " + node.starthour + " * * " + days,
       onTick: function() {
-        node.send([null, {
-          topic: "start",
-          payload: {
-            starttime: node.starthour + ":" + leftPad(node.startmin, 2, 0),
-            endtime: node.endhour + ":" + leftPad(node.endmin, 2, 0)
-          }
-        }]);
+        node.send([
+          null,
+          {
+            topic: "start",
+            payload: {
+              starttime: node.starthour + ":" + leftPad(node.startmin, 2, 0),
+              endtime: node.endhour + ":" + leftPad(node.endmin, 2, 0)
+            }
+          },
+          null
+        ]);
         node.status({ fill: "green", shape: "dot", text: "on" });
       },
       start: true
@@ -50,12 +54,13 @@ module.exports = function(RED) {
     node.cronOnEnd = new CronJob({
       cronTime: node.endmin + " " + node.endhour + " * * " + days,
       onTick: function() {
-        node.send([null, {
-          topic: "end",
-          payload: {
-            called: node.called
-          }
-        }]);
+        if (node.called == 0) {
+          node.send([
+            null,
+            null,
+            { topic: "end" }
+          ]);
+        }
         node.called = 0;
         node.status({ fill: "grey", shape: "dot", text: "off" });
       },
@@ -100,7 +105,7 @@ module.exports = function(RED) {
 
     function onCall(msg) {
       node.called += 1;
-      node.send([msg, null]);
+      node.send([msg, null, null]);
     }
 
     node.on("close", function() {
