@@ -16,6 +16,7 @@ module.exports = function(RED) {
     this.thu = config.thu;
     this.fri = config.fri;
     this.sat = config.sat;
+    this.once = config.once;
     this.cronOnStart = null;
     this.cronOnEnd = null;
     this.called = 0;
@@ -72,6 +73,8 @@ module.exports = function(RED) {
     });
 
     function shouldCall() {
+      if (node.once && node.called > 0) { return false; }
+
       var now = new Date();
 
       var nowoff = -now.getTimezoneOffset() * 60000;
@@ -105,6 +108,9 @@ module.exports = function(RED) {
 
     function onCall(msg) {
       node.called += 1;
+      if (node.once && node.called == 1) {
+        node.status({ fill: "grey", shape: "dot", text: "off" });
+      }
       node.send([msg, null, null]);
     }
 
